@@ -21,6 +21,13 @@
 //@property (nonatomic, assign) CGFloat floorFactor;
 @property (nonatomic, copy) NSString *title;
 
+@property (nonatomic, strong) UIColor *elevationLineColor;
+@property (nonatomic, assign) CGFloat elevationLineWidth;
+@property (nonatomic, assign) CGFloat elevationCircleRadius;
+
+@property (nonatomic, assign) BOOL displayElevationOnTapAndHold;
+@property (nonatomic, strong) UIColor *elevationTextColor;
+
 //
 // array of EAILocation objects
 - (id)initWithFrame:(CGRect)frame locations:(NSArray*)locations;

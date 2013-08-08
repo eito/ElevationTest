@@ -14,9 +14,11 @@
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet MKMapView *mapView;
+
 - (IBAction)exportLocations:(id)sender;
 - (IBAction)startAction:(id)sender;
-
 - (IBAction)stopAction:(id)sender;
+- (IBAction)toggleMapAndGraph:(id)sender;
 
+- (IBAction)showActivities:(id)sender;
 @end

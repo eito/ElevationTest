@@ -41,14 +41,19 @@
 }
 
 - (void)addLocations:(NSArray*)locations {
+    EAILocation *lastLoc = nil;
     for (EAILocation *location in locations) {
-        EAILocation *lastLoc = [self.locations lastObject];
         CGFloat climb = 0;
+        CGFloat adjClimb = 0;
         if (lastLoc) {
-            climb += location.altitude - lastLoc.altitude;
+            climb = location.altitude - lastLoc.altitude;
+            adjClimb = location.elevation - lastLoc.elevation;
         }
         if (climb > 0) {
             self.totalRawClimb += climb;
+        }
+        if (adjClimb > 0) {
+            self.totalAdjustedClimb += adjClimb;
         }
         
         self.currentAltitude = location.altitude;
@@ -60,6 +65,7 @@
         self.avgSpeed = ((self.avgSpeed * self.locations.count) + location.speed) / (self.locations.count + 1);
         
         [_locations addObject:location];
+        lastLoc = location;
     }
 }
 
@@ -88,15 +94,19 @@
     CGFloat currSpeed = 0;
     
     EAILocation *lastLoc = nil;
-    rawClimb = -[_locations[0] altitude];
-    adjClimb = -[_locations[0] elevation];
+    rawClimb = 0;
+    adjClimb = 0;
     for (EAILocation *l in _locations) {
-        CGFloat climb = l.altitude - lastLoc.altitude;
+        CGFloat climb = 0;
+        CGFloat adj = 0;
+        if (lastLoc) {
+            climb = l.altitude - lastLoc.altitude;
+            adj = l.elevation - lastLoc.elevation;
+        }
         if (climb > 0) {
             rawClimb += climb;
         }
         
-        CGFloat adj = l.elevation - lastLoc.elevation;
         if (adj > 0) {
             adjClimb += adj;
         }

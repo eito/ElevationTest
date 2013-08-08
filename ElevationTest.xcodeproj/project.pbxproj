@@ -35,6 +35,8 @@
 		4E4E629617ADBB0A000BD16C /* EAILocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E4E629517ADBB0A000BD16C /* EAILocation.m */; };
 		4E4E629E17AF1587000BD16C /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E4E629D17AF1587000BD16C /* MapKit.framework */; };
 		4E4E62A117AF1827000BD16C /* EAIElevationProfileView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E4E62A017AF1827000BD16C /* EAIElevationProfileView.m */; };
+		4E9ED05417B37A8500BEBF3D /* PopoverView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E9ED05217B37A8500BEBF3D /* PopoverView.m */; };
+		4E9ED05717B37DCC00BEBF3D /* EAIActivityListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E9ED05617B37DCC00BEBF3D /* EAIActivityListViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -95,6 +97,12 @@
 		4E4E629D17AF1587000BD16C /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		4E4E629F17AF1827000BD16C /* EAIElevationProfileView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EAIElevationProfileView.h; sourceTree = "<group>"; };
 		4E4E62A017AF1827000BD16C /* EAIElevationProfileView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EAIElevationProfileView.m; sourceTree = "<group>"; };
+		4E9ED05017B37A8500BEBF3D /* PopoverView_Configuration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PopoverView_Configuration.h; sourceTree = "<group>"; };
+		4E9ED05117B37A8500BEBF3D /* PopoverView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PopoverView.h; sourceTree = "<group>"; };
+		4E9ED05217B37A8500BEBF3D /* PopoverView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PopoverView.m; sourceTree = "<group>"; };
+		4E9ED05317B37A8500BEBF3D /* PopoverViewCompatibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PopoverViewCompatibility.h; sourceTree = "<group>"; };
+		4E9ED05517B37DCC00BEBF3D /* EAIActivityListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EAIActivityListViewController.h; sourceTree = "<group>"; };
+		4E9ED05617B37DCC00BEBF3D /* EAIActivityListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EAIActivityListViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,6 +180,8 @@
 				4E4E62A017AF1827000BD16C /* EAIElevationProfileView.m */,
 				4E2F4F4917B2282A00BAE0C1 /* EAIActivity.h */,
 				4E2F4F4A17B2282A00BAE0C1 /* EAIActivity.m */,
+				4E9ED05517B37DCC00BEBF3D /* EAIActivityListViewController.h */,
+				4E9ED05617B37DCC00BEBF3D /* EAIActivityListViewController.m */,
 			);
 			path = ElevationTest;
 			sourceTree = "<group>";
@@ -208,6 +218,7 @@
 		4E4E624D17ADB2EC000BD16C /* external */ = {
 			isa = PBXGroup;
 			children = (
+				4E9ED04F17B37A7A00BEBF3D /* PopoverView */,
 				4E4E626F17ADB32F000BD16C /* AFNetworking */,
 			);
 			name = external;
@@ -237,6 +248,17 @@
 				4E4E628217ADB32F000BD16C /* UIImageView+AFNetworking.m */,
 			);
 			path = AFNetworking;
+			sourceTree = "<group>";
+		};
+		4E9ED04F17B37A7A00BEBF3D /* PopoverView */ = {
+			isa = PBXGroup;
+			children = (
+				4E9ED05017B37A8500BEBF3D /* PopoverView_Configuration.h */,
+				4E9ED05117B37A8500BEBF3D /* PopoverView.h */,
+				4E9ED05217B37A8500BEBF3D /* PopoverView.m */,
+				4E9ED05317B37A8500BEBF3D /* PopoverViewCompatibility.h */,
+			);
+			name = PopoverView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -345,11 +367,13 @@
 				4E4E62A117AF1827000BD16C /* EAIElevationProfileView.m in Sources */,
 				4E4E628517ADB32F000BD16C /* AFImageRequestOperation.m in Sources */,
 				4E2F4F4B17B2282A00BAE0C1 /* EAIActivity.m in Sources */,
+				4E9ED05417B37A8500BEBF3D /* PopoverView.m in Sources */,
 				4E4E628417ADB32F000BD16C /* AFHTTPRequestOperation.m in Sources */,
 				4E4E629617ADBB0A000BD16C /* EAILocation.m in Sources */,
 				4E4E628317ADB32F000BD16C /* AFHTTPClient.m in Sources */,
 				4E4E628A17ADB32F000BD16C /* AFXMLRequestOperation.m in Sources */,
 				4E4E622617ADB175000BD16C /* EAIAppDelegate.m in Sources */,
+				4E9ED05717B37DCC00BEBF3D /* EAIActivityListViewController.m in Sources */,
 				4E4E622C17ADB175000BD16C /* EAIViewController.m in Sources */,
 				4E4E624C17ADB1A6000BD16C /* EAIElevationTask.m in Sources */,
 				4E4E628617ADB32F000BD16C /* AFJSONRequestOperation.m in Sources */,

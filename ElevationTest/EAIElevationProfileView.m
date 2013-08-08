@@ -13,6 +13,7 @@
     CGMutablePathRef _profilePath;
     CGMutablePathRef _fillPath;
     CGPoint _currentTouchPoint;
+    CGFloat _currentTouchPointElevation;
 }
 
 @property (nonatomic, strong) NSArray *locations;
@@ -31,12 +32,28 @@
         self.lineColor = [UIColor blueColor];
         self.fillColor = [UIColor redColor];
         self.lineWidth = 3.0f;
+        _currentTouchPoint = CGPointZero;
+        _currentTouchPointElevation = -9999;
+        self.displayElevationOnTapAndHold = YES;
+        self.elevationTextColor = [UIColor whiteColor];
+        
+        self.elevationCircleRadius = 10;
+        self.elevationLineColor = [UIColor greenColor];
+        self.elevationLineWidth = 2.0;
+    }
+    return self;
+}
+
+- (void)setDisplayElevationOnTapAndHold:(BOOL)displayElevationOnTapAndHold {
+    _displayElevationOnTapAndHold = displayElevationOnTapAndHold;
+    if (_displayElevationOnTapAndHold) {
         self.tapHoldGR = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(tapAndHold:)];
         self.tapHoldGR.delegate = self;
         [self addGestureRecognizer:self.tapHoldGR];
-        _currentTouchPoint = CGPointZero;
     }
-    return self;
+    else {
+        [self removeGestureRecognizer:self.tapHoldGR];
+    }
 }
 
 - (void)tapAndHold:(UILongPressGestureRecognizer*)sender {
@@ -49,13 +66,15 @@
     int idx = (int)(self.locations.count*pct);
     if (idx > self.locations.count - 1) {
         _currentTouchPoint = CGPointZero;
+        _currentTouchPointElevation = -9999;
         [self setNeedsDisplay];
         return;
     }
     EAILocation *l = self.locations[idx];
-    int elevation = l.elevation;
     CGFloat y = [self yValueForLocation:l];
-    NSLog(@"elev: %d", elevation);
+    int elevation = l.elevation;
+    _currentTouchPointElevation = elevation * 3.3;
+    //NSLog(@"elev: %d", elevation);
     
     if ([sender state] == UIGestureRecognizerStateEnded) {
         _currentTouchPoint = CGPointZero;
@@ -181,7 +200,23 @@
     // user is touching down
     if (!CGPointEqualToPoint(CGPointZero, _currentTouchPoint)) {
         CGContextSetFillColorWithColor(ctx, [[UIColor greenColor] CGColor]);
-        CGContextFillEllipseInRect(ctx, CGRectMake(_currentTouchPoint.x - 5, _currentTouchPoint.y - 5, 10, 10));
+        CGContextFillEllipseInRect(ctx, CGRectMake(_currentTouchPoint.x - self.elevationCircleRadius/2, _currentTouchPoint.y - self.elevationCircleRadius/2, self.elevationCircleRadius, self.elevationCircleRadius));
+        CGContextSetStrokeColorWithColor(ctx, [self.elevationLineColor CGColor]);
+        CGContextSetLineWidth(ctx, self.elevationLineWidth);
+        CGContextMoveToPoint(ctx, _currentTouchPoint.x, _currentTouchPoint.y);
+        CGContextAddLineToPoint(ctx, _currentTouchPoint.x, h);
+        CGContextStrokePath(ctx);
+        //
+        // text alignment for label
+        NSMutableParagraphStyle *mutParaStyle=[[NSMutableParagraphStyle alloc] init];
+        [mutParaStyle setAlignment:NSTextAlignmentRight];
+        
+        NSString *elevationString = [NSString stringWithFormat:@"%.2f ft", _currentTouchPointElevation];
+
+        NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithString:elevationString
+                                                                              attributes:@{ NSForegroundColorAttributeName : self.elevationTextColor, }];
+        [s addAttribute:NSParagraphStyleAttributeName value:mutParaStyle range:NSMakeRange(0, [s length])];
+        [s drawInRect:CGRectMake(w - 55, h - 20, 50, 20)];
     }
 }
 

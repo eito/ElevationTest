@@ -11,8 +11,10 @@
 #import "EAILocation.h"
 #import "EAIElevationProfileView.h"
 #import "EAIActivity.h"
+#import "PopoverView.h"
+#import "EAIActivityListViewController.h"
 
-@interface EAIViewController ()<CLLocationManagerDelegate, UITableViewDataSource, UITableViewDelegate> {
+@interface EAIViewController ()<CLLocationManagerDelegate, UITableViewDataSource, UITableViewDelegate, MKMapViewDelegate, PopoverViewDelegate> {
     EAIElevationTask *_elevationTask;
     CLLocationManager *_locationManager;
     NSMutableArray *_locations;
@@ -22,6 +24,10 @@
     BOOL _bg;
     BOOL _record;
     EAIActivity *_activity;
+    MKPolylineView *_currentActivityView;
+    MKMapRect _currentActivityBBox;
+    PopoverView *_popover;
+    NSMutableArray *_activityFiles;
 }
 
 @end
@@ -50,6 +56,82 @@
     }
 }
 
+- (void)loadDataForActivityAtURL:(NSURL*)fileURL {
+    [_locationManager stopUpdatingLocation];
+    
+    NSData *data = [NSData dataWithContentsOfURL:fileURL];
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:nil];
+    NSArray *jsonArray = json[@"locations"];
+    NSMutableArray *locations = [@[] mutableCopy];
+    _activity = [EAIActivity activity];
+    for (NSDictionary *d in jsonArray) {
+        [locations addObject:[[EAILocation alloc] initWithJSON:d]];
+    }
+    [_activity addLocations:locations];
+    
+    [self.tableView reloadData];
+    
+    [self.mapView removeOverlays:self.mapView.overlays];
+    [_profileView removeFromSuperview];
+    _profileView = [[EAIElevationProfileView alloc] initWithFrame:CGRectMake(5, 20, 310, 180) locations:locations];
+    _profileView.hidden = YES;
+    _profileView.layer.borderColor = [[UIColor blackColor] CGColor];
+    _profileView.layer.borderWidth = 2.0f;
+    _profileView.backgroundColor = [UIColor whiteColor];
+    _profileView.lineWidth = 3.0;
+    _profileView.lineColor = [UIColor blueColor];
+    _profileView.fillColor = [UIColor colorWithRed:0 green:120/255.0 blue:240/255.0 alpha:1.0];
+    _profileView.minX = 0;
+    _profileView.maxX = 320;
+    _profileView.minY = 0;
+    _profileView.maxY = 160;
+    [self.view addSubview:_profileView];
+    
+    //
+    // add line
+    CLLocationCoordinate2D *coordinateArray = malloc(sizeof(CLLocationCoordinate2D) * _activity.locations.count);
+    
+    int caIndex = 0;
+    double xmin = 0;
+    double xmax = 0;
+    double ymin = 0;
+    double ymax = 0;
+    for (EAILocation *loc in _activity.locations) {
+        CLLocationCoordinate2D coord = CLLocationCoordinate2DMake(loc.latitude, loc.longitude);
+        coordinateArray[caIndex] = coord;
+        MKMapPoint pt = MKMapPointForCoordinate(coord);
+        if (caIndex == 0) {
+            xmin = pt.x;
+            xmax = pt.x;
+            ymin = pt.y;
+            ymax = pt.y;
+        }
+        else {
+            if (pt.y < ymin) {
+                ymin = pt.y;
+            }
+            if (pt.y > ymax) {
+                ymax = pt.y;
+            }
+            if (pt.x < xmin) {
+                xmin = pt.x;
+            }
+            if (pt.x > xmax) {
+                xmax = pt.x;
+            }
+        }
+        caIndex++;
+    }
+    _currentActivityBBox = MKMapRectMake(xmin, ymin, xmax - xmin, ymax - ymin);
+    MKPolyline *lines = [MKPolyline polylineWithCoordinates:coordinateArray
+                                                      count:_activity.locations.count];
+    
+    free(coordinateArray);
+    [self.mapView addOverlay:lines];
+    [self.mapView setVisibleMapRect:_currentActivityBBox animated:YES];
+
+}
+
 - (void)viewDidLoad
 {
     
@@ -65,36 +147,79 @@
     NSString *dirPath = paths[0];
     NSString *filepath = [NSString stringWithFormat:@"%@/locations.json", dirPath];
     
+    self.mapView.delegate = self;
+    
     if ([[NSFileManager defaultManager] fileExistsAtPath:filepath]) {
-        self.mapView.hidden = YES;
-        NSData *data = [NSData dataWithContentsOfFile:filepath];
-        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:nil];
-        NSArray *jsonArray = json[@"locations"];
-        NSMutableArray *locations = [@[] mutableCopy];
-        _activity = [EAIActivity activity];
-        for (NSDictionary *d in jsonArray) {
-            [locations addObject:[[EAILocation alloc] initWithJSON:d]];
-        }
-        [_activity addLocations:locations];
-        
-        _profileView = [[EAIElevationProfileView alloc] initWithFrame:CGRectMake(10, 320, 300, 160) locations:locations];
-        _profileView.layer.borderColor = [[UIColor blackColor] CGColor];
-        _profileView.layer.borderWidth = 2.0f;
-        _profileView.backgroundColor = [UIColor whiteColor];
-        _profileView.lineWidth = 3.0;
-        _profileView.lineColor = [UIColor blueColor];
-        _profileView.fillColor = [UIColor colorWithRed:0 green:120/255.0 blue:240/255.0 alpha:1.0];
-        _profileView.minX = 0;
-        _profileView.maxX = 320;
-        _profileView.minY = 0;
-        _profileView.maxY = 160;
-        [self.view addSubview:_profileView];
-        return;
+        NSURL *url = [NSURL fileURLWithPath:filepath];
+        [self loadDataForActivityAtURL:url];
+//        NSData *data = [NSData dataWithContentsOfFile:filepath];
+//        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:nil];
+//        NSArray *jsonArray = json[@"locations"];
+//        NSMutableArray *locations = [@[] mutableCopy];
+//        _activity = [EAIActivity activity];
+//        for (NSDictionary *d in jsonArray) {
+//            [locations addObject:[[EAILocation alloc] initWithJSON:d]];
+//        }
+//        [_activity addLocations:locations];
+//        
+//        _profileView = [[EAIElevationProfileView alloc] initWithFrame:CGRectMake(5, 20, 310, 180) locations:locations];
+//        _profileView.hidden = YES;
+//        _profileView.layer.borderColor = [[UIColor blackColor] CGColor];
+//        _profileView.layer.borderWidth = 2.0f;
+//        _profileView.backgroundColor = [UIColor whiteColor];
+//        _profileView.lineWidth = 3.0;
+//        _profileView.lineColor = [UIColor blueColor];
+//        _profileView.fillColor = [UIColor colorWithRed:0 green:120/255.0 blue:240/255.0 alpha:1.0];
+//        _profileView.minX = 0;
+//        _profileView.maxX = 320;
+//        _profileView.minY = 0;
+//        _profileView.maxY = 160;
+//        [self.view addSubview:_profileView];
+//        
+//        //
+//        // add line
+//        CLLocationCoordinate2D *coordinateArray = malloc(sizeof(CLLocationCoordinate2D) * _activity.locations.count);
+//        
+//        int caIndex = 0;
+//        double xmin = 0;
+//        double xmax = 0;
+//        double ymin = 0;
+//        double ymax = 0;
+//        for (EAILocation *loc in _activity.locations) {
+//            coordinateArray[caIndex] = CLLocationCoordinate2DMake(loc.latitude, loc.longitude);
+//            MKMapPoint pt = MKMapPointForCoordinate(CLLocationCoordinate2DMake(loc.latitude, loc.longitude));
+//            if (caIndex == 0) {
+//                xmin = pt.x;
+//                xmax = pt.x;
+//                ymin = pt.y;
+//                ymax = pt.y;
+//            }
+//            else {
+//                if (pt.y < ymin) {
+//                    ymin = pt.y;
+//                }
+//                if (pt.y > ymax) {
+//                    ymax = pt.y;
+//                }
+//                if (pt.x < xmin) {
+//                    xmin = pt.x;
+//                }
+//                if (pt.x > xmax) {
+//                    xmax = pt.x;
+//                }
+//            }
+//            caIndex++;
+//        }
+//        _currentActivityBBox = MKMapRectMake(xmin, ymin, xmax - xmin, ymax - ymin);
+//        MKPolyline *lines = [MKPolyline polylineWithCoordinates:coordinateArray
+//                                                          count:_activity.locations.count];
+//
+//        free(coordinateArray);
+//        [self.mapView addOverlay:lines];
+//        [self.mapView setVisibleMapRect:_currentActivityBBox animated:YES];
+//        return;
     }
 
-    self.mapView.hidden = YES;
-//    [self.mapView showsUserLocation];
-//    [self.mapView setUserTrackingMode:MKUserTrackingModeFollow animated:YES];
     
     _locationManager = [[CLLocationManager alloc] init];
     _locationManager.activityType = CLActivityTypeFitness;
@@ -158,6 +283,10 @@
     NSLog(@"+++%s", __PRETTY_FUNCTION__);
 }
 
+- (void)dismissPopover {
+    [_popover dismiss:YES];
+}
+
 #pragma Actions
 
 - (IBAction)startAction:(id)sender {
@@ -166,12 +295,70 @@
     
     //_locations = [@[] mutableCopy];
 //    [_locationManager startUpdatingLocation];
+    [self.mapView removeOverlays:self.mapView.overlays];
+    [self.mapView showsUserLocation];
+    [self.mapView setUserTrackingMode:MKUserTrackingModeFollow animated:YES];
+    
 }
 
 - (IBAction)stopAction:(id)sender {
 //    [_locationManager disallowDeferredLocationUpdates];
     //[_locationManager stopUpdatingLocation];
     _record = NO;
+}
+
+- (IBAction)toggleMapAndGraph:(id)sender {
+    UISegmentedControl *seg = (UISegmentedControl*)sender;
+    if (seg.selectedSegmentIndex == 0) {
+        self.mapView.hidden = NO;
+        // map visible
+        _profileView.hidden = YES;
+        // graph hidden
+    }
+    else {
+        self.mapView.hidden = YES;
+        // map hidden
+        _profileView.hidden = NO;
+        // graph visible
+    }
+}
+
+- (IBAction)showActivities:(id)sender {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *dirPath = paths[0];
+    NSArray *filepaths = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:dirPath error:nil];
+    _activityFiles = [@[] mutableCopy];
+    for (NSString *path in filepaths) {
+        if ([path hasSuffix:@".json"]) {
+            [_activityFiles addObject:path];
+        }
+    }
+
+//    _activityListVC = [[EAIActivityListViewController alloc] init];
+//    __weak EAIViewController *weakSelf = self;
+//    _activityListVC.activitySelectBlock = ^(NSURL *fileURL) {
+//        [weakSelf loadDataForActivityAtURL:fileURL];
+//        [weakSelf performSelectorOnMainThread:@selector(dismissPopover) withObject:nil waitUntilDone:NO];
+//    };
+    CGRect r = [(UIButton*)sender frame];
+    [PopoverView showPopoverAtPoint:CGPointMake(r.origin.x + r.size.width/2, r.origin.y) inView:self.view withStringArray:_activityFiles delegate:self];
+//    CGPoint center = CGPointMake(r.origin.x + r.size.width/2, r.origin.y);
+//    [PopoverView showPopoverAtPoint:center
+//                             inView:self.view
+//                          withTitle:@"Activities"
+//                    withContentView:_activityListVC.view
+//                           delegate:self];
+//    [PopoverView showPopoverAtPoint:CGPointMake(r.origin.x + r.size.width/2, r.origin.y) inView:self.view withContentView:_activityListVC.view delegate:self];
+}
+
+-(void)popoverView:(PopoverView *)popoverView didSelectItemAtIndex:(NSInteger)index {
+    NSLog(@"called");
+    [popoverView dismiss:YES];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *dirPath = paths[0];
+    NSString *path = [NSString stringWithFormat:@"%@/%@",dirPath, _activityFiles[index]];
+    NSURL *fileURL = [NSURL fileURLWithPath:path];
+    [self loadDataForActivityAtURL:fileURL];
 }
 
 - (IBAction)exportLocations:(id)sender {
@@ -274,5 +461,22 @@
             break;
     }
     return cell;
+}
+
+#pragma mark MKMapViewDelegate
+
+- (MKOverlayView *)mapView:(MKMapView *)mapView viewForOverlay:(id )overlay
+{
+    //if we have not yet created an overlay view for this overlay, create it now.
+    if(!_currentActivityView)
+    {
+        _currentActivityView = [[MKPolylineView alloc] initWithPolyline:(MKPolyline*)overlay];
+        _currentActivityView.fillColor = [UIColor blueColor];
+        _currentActivityView.strokeColor = [UIColor blueColor];
+        _currentActivityView.lineWidth = 5;
+    }
+
+    return _currentActivityView;
+    
 }
 @end
