@@ -126,10 +126,9 @@
     MKPolyline *lines = [MKPolyline polylineWithCoordinates:coordinateArray
                                                       count:_activity.locations.count];
     
-    free(coordinateArray);
     [self.mapView addOverlay:lines];
     [self.mapView setVisibleMapRect:_currentActivityBBox animated:YES];
-
+    free(coordinateArray);
 }
 
 - (void)viewDidLoad
@@ -137,7 +136,6 @@
     
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-    
 //      UIApplicationDidEnterBackgroundNotification
 //      UIApplicationWillEnterForegroundNotification
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(goBG) name:@"UIApplicationDidEnterBackgroundNotification" object:nil];
@@ -389,14 +387,38 @@
             [NSJSONSerialization writeJSONObject:json
                                         toStream:outStream
                                          options:NSJSONWritingPrettyPrinted
-                                           error:nil];
+                                           error:&error];
             [outStream close];
+            if (error) {
+                UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"Error Serializing JSON"
+                                                             message:[error localizedDescription]
+                                                            delegate:nil
+                                                   cancelButtonTitle:@"Ok"
+                                                   otherButtonTitles: nil];
+                [av show];
+                NSLog(@"error serializing JSON: %@", error);
+            }
+            else {
+                UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"Activity Saved!"
+                                                             message:[NSString stringWithFormat:@"%d.json", (int)nowSecs]
+                                                            delegate:nil
+                                                   cancelButtonTitle:@"Ok"
+                                                   otherButtonTitles: nil];
+                [av show];
+            }
         }
         else {
-            NSLog(@"error: %@", error);
+            UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"Error getting elevations"
+                                                         message:[error localizedDescription]
+                                                        delegate:nil
+                                               cancelButtonTitle:@"Ok"
+                                               otherButtonTitles: nil];
+            [av show];
+            NSLog(@"error getting elevations: %@", error);
         }
     };
     [_elevationTask findAstergdemElevationsForLocations:_activity.locations];
+//    [_elevationTask findGoogleElevationsForLocations:_activity.locations];
 //    [_elevationTask findAstergdemElevationsForLocations:_locations];
 }
 
@@ -468,13 +490,13 @@
 - (MKOverlayView *)mapView:(MKMapView *)mapView viewForOverlay:(id )overlay
 {
     //if we have not yet created an overlay view for this overlay, create it now.
-    if(!_currentActivityView)
-    {
+//    if(!_currentActivityView)
+//    {
         _currentActivityView = [[MKPolylineView alloc] initWithPolyline:(MKPolyline*)overlay];
         _currentActivityView.fillColor = [UIColor blueColor];
         _currentActivityView.strokeColor = [UIColor blueColor];
         _currentActivityView.lineWidth = 5;
-    }
+//    }
 
     return _currentActivityView;
     

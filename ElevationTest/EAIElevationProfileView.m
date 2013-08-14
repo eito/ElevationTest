@@ -216,7 +216,7 @@
         NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithString:elevationString
                                                                               attributes:@{ NSForegroundColorAttributeName : self.elevationTextColor, }];
         [s addAttribute:NSParagraphStyleAttributeName value:mutParaStyle range:NSMakeRange(0, [s length])];
-        [s drawInRect:CGRectMake(w - 55, h - 20, 50, 20)];
+        [s drawInRect:CGRectMake(w - 85, h - 20, 80, 20)];
     }
 }
 

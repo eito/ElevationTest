@@ -27,5 +27,7 @@
 // pass in array of CLLocation objects
 - (void)findAstergdemElevationsForLocations:(NSArray*)locations;
 
+- (void)findGoogleElevationsForLocations:(NSArray*)locations;
+
 - (void)cancel;
 @end
