@@ -369,7 +369,7 @@
         [weakSelf.tableView reloadData];
         NSLog(@"elevation count: %d", elevations.count);
         if (!error) {
-            NSLog(@"elevations: %@", elevations);
+            //NSLog(@"elevations: %@", elevations);
             NSMutableDictionary *json = [@{} mutableCopy];
             NSMutableArray *locations = [@[] mutableCopy];
             for (EAILocation *loc in elevations) {
@@ -395,7 +395,8 @@
                                                             delegate:nil
                                                    cancelButtonTitle:@"Ok"
                                                    otherButtonTitles: nil];
-                [av show];
+//                [av show];
+                [weakSelf showAlertOnMainThread:av];
                 NSLog(@"error serializing JSON: %@", error);
             }
             else {
@@ -404,7 +405,8 @@
                                                             delegate:nil
                                                    cancelButtonTitle:@"Ok"
                                                    otherButtonTitles: nil];
-                [av show];
+//                [av show];
+                [weakSelf showAlertOnMainThread:av];
             }
         }
         else {
@@ -413,7 +415,8 @@
                                                         delegate:nil
                                                cancelButtonTitle:@"Ok"
                                                otherButtonTitles: nil];
-            [av show];
+            //[av show];
+            [weakSelf showAlertOnMainThread:av];
             NSLog(@"error getting elevations: %@", error);
         }
     };
@@ -422,6 +425,9 @@
     [_elevationTask calculateElevationsForLocations:_activity.locations];
 }
 
+- (void)showAlertOnMainThread:(UIAlertView*)av {
+    [av performSelectorOnMainThread:@selector(show) withObject:nil waitUntilDone:NO];
+}
 #pragma mark UITableView
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
