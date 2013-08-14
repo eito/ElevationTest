@@ -22,6 +22,7 @@ typedef enum {
 @property (nonatomic, strong) NSMutableArray *results;
 @property (nonatomic, strong) NSMutableArray *operations;
 @end
+
 @implementation EAIElevationTask
 
 - (id)init {
@@ -106,18 +107,25 @@ typedef enum {
         [self.operations addObject:jrop];
         [self.queue addOperation:jrop];
 
+    }
+}
+
 - (void)calculateElevationsForLocations:(NSArray*)locations {
     NSInvocationOperation *invOp = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(localCalculateElevations:) object:locations];
     [self.queue addOperation:invOp];
 }
 
 - (void)localCalculateElevations:(NSArray*)locations {
-    for (EAILocation *location in locations) {
-        location.elevation = [[GDALUtility sharedUtility] elevationForLatitude:location.latitude longitude:location.longitude];
-    }
+    double s = CACurrentMediaTime();
+    [[GDALUtility sharedUtility] calculateElevationsForLocations:locations];
+//    for (EAILocation *location in locations) {
+//        location.elevation = [[GDALUtility sharedUtility] elevationForLatitude:location.latitude longitude:location.longitude];
+//    }
     if (self.completionBlock) {
         self.completionBlock(locations, nil);
     }
+    double end = CACurrentMediaTime() - s;
+    NSLog(@"+++++++++TIME: %f", end);
 }
 
 - (void)cancel {

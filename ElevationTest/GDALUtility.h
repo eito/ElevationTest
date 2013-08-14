@@ -11,6 +11,9 @@
 @interface GDALUtility : NSObject
 
 - (double)elevationForLatitude:(double)latitude longitude:(double)longitude;
+- (void)calculateElevationsForLocations:(NSArray*)locations;
+
+- (void)calculateElevationsForLatitudes:(NSArray *)latitudes longitudes:(NSArray*)longitudes;
 
 + (instancetype)sharedUtility;
 @end

@@ -7,7 +7,7 @@
 //
 
 #import "GDALUtility.h"
-
+#import "EAILocation.h"
 #include "gdal_priv.h"
 //#include "cpl_conv.h"
 
@@ -15,6 +15,7 @@ static const NSString *kN34W117 = @"n34w117/grdn34w117_13/w001001.adf";
 static const NSString *kN35W117 = @"n35w117/grdn35w117_13/w001001.adf";
 static const NSString *kN34W118 = @"n34w118/grdn34w118_13/w001001.adf";
 static const NSString *kN35W118 = @"n35w118/grdn35w118_13/w001001.adf";
+
 
 @interface GDALUtility () {
     GDALDataset *_poDataset;
@@ -29,12 +30,18 @@ static const NSString *kN35W118 = @"n35w118/grdn35w118_13/w001001.adf";
     self = [super init];
     if (self) {
         GDALAllRegister();
+        NSString *filepath = [self filepathForLatitude:34.1 longitude:-117.1];
+        _poDataset =(GDALDataset*)GDALOpen([filepath UTF8String], GA_ReadOnly);
     }
     return self;
 }
 
 + (instancetype)sharedUtility {
-    return [[self alloc] init];
+    static GDALUtility *kGDAL = nil;
+    if (!kGDAL) {
+        kGDAL = [[GDALUtility alloc] init];
+    }
+    return kGDAL;
 }
 
 - (void)dealloc {
@@ -43,10 +50,25 @@ static const NSString *kN35W118 = @"n35w118/grdn35w118_13/w001001.adf";
     }
 }
 
+- (void)calculateElevationsForLocations:(NSArray*)locations {
+    for (EAILocation *l in locations) {
+        l.elevation = [self elevationForLatitude:l.latitude longitude:l.longitude];
+    }
+}
+
+- (void)calculateElevationsForLatitudes:(NSArray *)latitudes longitudes:(NSArray*)longitudes {
+    if (latitudes.count != longitudes.count) {
+        return;
+    }
+    for (NSNumber *latitude in latitudes) {
+        
+    }
+}
+
 - (double)elevationForLatitude:(double)latitude longitude:(double)longitude {
     float elevation = -9999.0;
     NSString *filepath = [self filepathForLatitude:latitude longitude:longitude];
-    _poDataset = (GDALDataset*)GDALOpen([filepath UTF8String], GA_ReadOnly);
+    //_poDataset = (GDALDataset*)GDALOpen([filepath UTF8String], GA_ReadOnly);
     if (_poDataset) {
         double adfGeoTransform[6];
         if (_poDataset->GetGeoTransform(adfGeoTransform) == CE_None) {
@@ -68,8 +90,8 @@ static const NSString *kN35W118 = @"n35w118/grdn35w118_13/w001001.adf";
                 //NSLog(@"Success");
             }
         }
-        GDALClose(_poDataset);
-        _poDataset = NULL;
+//        GDALClose(_poDataset);
+//        _poDataset = NULL;
     }
     return elevation;
 }
