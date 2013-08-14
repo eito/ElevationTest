@@ -60,6 +60,8 @@
     CGPoint pt = [sender locationInView:self];
 //    NSLog(@"pt: %@", NSStringFromCGPoint(pt));
     
+    CGFloat h = CGRectGetHeight(self.bounds);
+    CGRect oldRect = CGRectMake(_currentTouchPoint.x - 5, 0, 10, h);
     CGFloat x = pt.x;
     CGFloat w = CGRectGetWidth(self.bounds);
     CGFloat pct = x/w;
@@ -73,7 +75,7 @@
     EAILocation *l = self.locations[idx];
     CGFloat y = [self yValueForLocation:l];
     int elevation = l.elevation;
-    _currentTouchPointElevation = elevation * 3.3;
+    _currentTouchPointElevation = elevation * 3.28;
     //NSLog(@"elev: %d", elevation);
     
     if ([sender state] == UIGestureRecognizerStateEnded) {
@@ -82,7 +84,9 @@
     else {
         _currentTouchPoint = CGPointMake(x, y);
     }
-    [self setNeedsDisplay];
+    CGRect newRect = CGRectMake(_currentTouchPoint.x - 5, 0, 10, h);
+    [self setNeedsDisplayInRect:CGRectUnion(oldRect, newRect)];
+    [self setNeedsDisplayInRect:CGRectMake(w - 85, h - 20, 80, 20)];
 }
 
 - (void)setLocations:(NSArray *)locations {
