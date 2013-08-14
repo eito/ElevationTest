@@ -149,7 +149,7 @@
 ////    CGContextDrawPath(ctx, kCGPathStroke);
 //}
 
-- (void)drawRect:(CGRect)rect
+- (void)drawRect2:(CGRect)rect
 {
     CGFloat h = CGRectGetHeight(self.bounds);
     CGFloat w = CGRectGetWidth(self.bounds);
@@ -223,6 +223,112 @@
         [s drawInRect:CGRectMake(w - 85, h - 20, 80, 20)];
     }
 }
+
+- (CGMutablePathRef)fillPathForContext:(CGContextRef)ctx {
+    if (!_fillPath) {
+        CGFloat h = CGRectGetHeight(self.bounds);
+        CGFloat w = CGRectGetWidth(self.bounds);
+        
+        _fillPath = CGPathCreateMutableCopy([self profilePath]);
+        //
+        // create a copy that we can close to draw the area under the curve
+        CGPathAddLineToPoint(_fillPath, NULL, w, h);
+        CGPathAddLineToPoint(_fillPath, NULL, 0, h);
+    }
+    return _fillPath;
+}
+
+- (CGMutablePathRef)profilePath {
+    if (!_profilePath) {
+        _profilePath = CGPathCreateMutable();
+        CGFloat currX = CGRectGetMinX(self.bounds);
+        CGFloat currY = 0;
+        CGFloat w = CGRectGetWidth(self.bounds);
+        // Drawing code
+        int i = 0;
+        CGFloat step = w / self.locations.count;
+        for (EAILocation *location in self.locations) {
+            //
+            // UIKit has origin at top left, so whatever y we calculate needs to be flippped
+            // also we adjust max value by using 10% more than that so the high point is not at top of view
+            //currY = h - (location.elevation / (self.maxValue*(1+self.ceilingFactor) - self.minY)) * h;
+            currY = [self yValueForLocation:location];
+            //NSLog(@"currY: %f, elevation: %d", currY, location.elevation);
+            if (i == 0) {
+                CGPathMoveToPoint(_profilePath, NULL, currX, currY);
+                i++;
+            }
+            else {
+                CGPathAddLineToPoint(_profilePath, NULL, currX, currY);
+            }
+            currX += step;
+        }
+    }
+    return _profilePath;
+}
+
+- (void)dealloc {
+    if (_profilePath) {
+        CGPathRelease(_profilePath);
+    }
+    if (_fillPath) {
+        CGPathRelease(_fillPath);
+    }
+}
+
+//
+// caches PATHs
+- (void)drawRect:(CGRect)rect
+{
+    CGFloat h = CGRectGetHeight(self.bounds);
+    CGFloat w = CGRectGetWidth(self.bounds);
+    
+    CGMutablePathRef profilePath = [self profilePath];
+    
+    CGContextRef ctx = UIGraphicsGetCurrentContext();
+    CGContextSetLineJoin(ctx, kCGLineJoinRound);
+    CGContextSetLineCap(ctx, kCGLineCapRound);
+    CGContextSetStrokeColorWithColor(ctx, [self.lineColor CGColor]);
+    CGContextSetLineWidth(ctx, self.lineWidth);
+    
+    //
+    // create a copy that we can close to draw the area under the curve
+    CGMutablePathRef pathCopy = [self fillPathForContext:ctx];
+    CGContextSetFillColorWithColor(ctx, [self.fillColor CGColor]);
+    CGContextAddPath(ctx, pathCopy);
+    CGContextDrawPath(ctx, kCGPathFill);
+//    CGPathRelease(pathCopy);
+    
+    //
+    // draw our top line in main color
+    CGContextAddPath(ctx, profilePath);
+    CGContextDrawPath(ctx, kCGPathStroke);
+//    CGPathRelease(profilePath);
+    
+    //
+    // user is touching down
+    if (!CGPointEqualToPoint(CGPointZero, _currentTouchPoint)) {
+        CGContextSetFillColorWithColor(ctx, [[UIColor greenColor] CGColor]);
+        CGContextFillEllipseInRect(ctx, CGRectMake(_currentTouchPoint.x - self.elevationCircleRadius/2, _currentTouchPoint.y - self.elevationCircleRadius/2, self.elevationCircleRadius, self.elevationCircleRadius));
+        CGContextSetStrokeColorWithColor(ctx, [self.elevationLineColor CGColor]);
+        CGContextSetLineWidth(ctx, self.elevationLineWidth);
+        CGContextMoveToPoint(ctx, _currentTouchPoint.x, _currentTouchPoint.y);
+        CGContextAddLineToPoint(ctx, _currentTouchPoint.x, h);
+        CGContextStrokePath(ctx);
+        //
+        // text alignment for label
+        NSMutableParagraphStyle *mutParaStyle=[[NSMutableParagraphStyle alloc] init];
+        [mutParaStyle setAlignment:NSTextAlignmentRight];
+        
+        NSString *elevationString = [NSString stringWithFormat:@"%.2f ft", _currentTouchPointElevation];
+        
+        NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithString:elevationString
+                                                                              attributes:@{ NSForegroundColorAttributeName : self.elevationTextColor, }];
+        [s addAttribute:NSParagraphStyleAttributeName value:mutParaStyle range:NSMakeRange(0, [s length])];
+        [s drawInRect:CGRectMake(w - 85, h - 20, 80, 20)];
+    }
+}
+
 
 - (CGFloat)yValueForLocation:(EAILocation*)location {
     CGFloat h = CGRectGetHeight(self.bounds);
