@@ -19,7 +19,7 @@
                   course:(CLLocationDirection)course
                    speed:(CLLocationSpeed)speed
                timestamp:(NSDate *)timestamp
-               elevation:(double)elevation;
+               elevation:(CGFloat)elevation;
 
 
 
@@ -35,7 +35,8 @@
 
 //
 // readwrite so we can update this from the service
-@property (nonatomic, assign, readwrite) NSInteger elevation;
+@property (nonatomic, assign, readwrite) CGFloat elevation;
+
 
 - (id)initWithJSON:(NSDictionary*)json;
 - (NSDictionary*)encodeToJSON;

@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4E01BD2317BB62DE00206D8C /* GDALUtility.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4E01BD2217BB62DE00206D8C /* GDALUtility.mm */; };
+		4E01BD2517BB632C00206D8C /* libstdc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E01BD2417BB632C00206D8C /* libstdc++.dylib */; };
+		4E01BD2717BB633100206D8C /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E01BD2617BB633100206D8C /* libiconv.dylib */; };
+		4E01BD2917BB633700206D8C /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E01BD2817BB633700206D8C /* libz.dylib */; };
+		4E01BD2B17BB634C00206D8C /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E01BD2A17BB634C00206D8C /* libsqlite3.dylib */; };
 		4E2F4F4B17B2282A00BAE0C1 /* EAIActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E2F4F4A17B2282A00BAE0C1 /* EAIActivity.m */; };
 		4E4E621617ADB175000BD16C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E4E621517ADB175000BD16C /* Foundation.framework */; };
 		4E4E621817ADB175000BD16C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E4E621717ADB175000BD16C /* CoreGraphics.framework */; };
@@ -50,6 +55,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4E01BD2117BB62DE00206D8C /* GDALUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDALUtility.h; sourceTree = "<group>"; };
+		4E01BD2217BB62DE00206D8C /* GDALUtility.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GDALUtility.mm; sourceTree = "<group>"; };
+		4E01BD2417BB632C00206D8C /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "usr/lib/libstdc++.dylib"; sourceTree = SDKROOT; };
+		4E01BD2617BB633100206D8C /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = usr/lib/libiconv.dylib; sourceTree = SDKROOT; };
+		4E01BD2817BB633700206D8C /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		4E01BD2A17BB634C00206D8C /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		4E2F4F4917B2282A00BAE0C1 /* EAIActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EAIActivity.h; sourceTree = "<group>"; };
 		4E2F4F4A17B2282A00BAE0C1 /* EAIActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EAIActivity.m; sourceTree = "<group>"; };
 		4E4E621217ADB175000BD16C /* ElevationTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ElevationTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -110,6 +121,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E01BD2B17BB634C00206D8C /* libsqlite3.dylib in Frameworks */,
+				4E01BD2917BB633700206D8C /* libz.dylib in Frameworks */,
+				4E01BD2717BB633100206D8C /* libiconv.dylib in Frameworks */,
+				4E01BD2517BB632C00206D8C /* libstdc++.dylib in Frameworks */,
 				4E4E629E17AF1587000BD16C /* MapKit.framework in Frameworks */,
 				4E4E621817ADB175000BD16C /* CoreGraphics.framework in Frameworks */,
 				4E4E621A17ADB175000BD16C /* UIKit.framework in Frameworks */,
@@ -152,6 +167,10 @@
 		4E4E621417ADB175000BD16C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4E01BD2A17BB634C00206D8C /* libsqlite3.dylib */,
+				4E01BD2817BB633700206D8C /* libz.dylib */,
+				4E01BD2617BB633100206D8C /* libiconv.dylib */,
+				4E01BD2417BB632C00206D8C /* libstdc++.dylib */,
 				4E4E629D17AF1587000BD16C /* MapKit.framework */,
 				4E4E621517ADB175000BD16C /* Foundation.framework */,
 				4E4E621717ADB175000BD16C /* CoreGraphics.framework */,
@@ -178,6 +197,8 @@
 				4E4E629517ADBB0A000BD16C /* EAILocation.m */,
 				4E4E629F17AF1827000BD16C /* EAIElevationProfileView.h */,
 				4E4E62A017AF1827000BD16C /* EAIElevationProfileView.m */,
+				4E01BD2117BB62DE00206D8C /* GDALUtility.h */,
+				4E01BD2217BB62DE00206D8C /* GDALUtility.mm */,
 				4E2F4F4917B2282A00BAE0C1 /* EAIActivity.h */,
 				4E2F4F4A17B2282A00BAE0C1 /* EAIActivity.m */,
 				4E9ED05517B37DCC00BEBF3D /* EAIActivityListViewController.h */,
@@ -369,6 +390,7 @@
 				4E2F4F4B17B2282A00BAE0C1 /* EAIActivity.m in Sources */,
 				4E9ED05417B37A8500BEBF3D /* PopoverView.m in Sources */,
 				4E4E628417ADB32F000BD16C /* AFHTTPRequestOperation.m in Sources */,
+				4E01BD2317BB62DE00206D8C /* GDALUtility.mm in Sources */,
 				4E4E629617ADBB0A000BD16C /* EAILocation.m in Sources */,
 				4E4E628317ADB32F000BD16C /* AFHTTPClient.m in Sources */,
 				4E4E628A17ADB32F000BD16C /* AFXMLRequestOperation.m in Sources */,
@@ -502,11 +524,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_CXX_LIBRARY = "libstdc++";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ElevationTest/ElevationTest-Prefix.pch";
+				HEADER_SEARCH_PATHS = "$HOME/Desktop/gdal/include/**";
 				INFOPLIST_FILE = "ElevationTest/ElevationTest-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				LIBRARY_SEARCH_PATHS = "$HOME/Desktop/gdal/lib/**";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-lgdal",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -517,11 +546,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_CXX_LIBRARY = "libstdc++";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "ElevationTest/ElevationTest-Prefix.pch";
+				HEADER_SEARCH_PATHS = "$HOME/Desktop/gdal/include/**";
 				INFOPLIST_FILE = "ElevationTest/ElevationTest-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				LIBRARY_SEARCH_PATHS = "$HOME/Desktop/gdal/lib/**";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-lgdal",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};

@@ -28,6 +28,9 @@
 - (void)findAstergdemElevationsForLocations:(NSArray*)locations;
 
 - (void)findGoogleElevationsForLocations:(NSArray*)locations;
+//
+// LOCAL!
+- (void)calculateElevationsForLocations:(NSArray*)locations;
 
 - (void)cancel;
 @end

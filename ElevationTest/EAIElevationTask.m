@@ -9,6 +9,7 @@
 #import "EAIElevationTask.h"
 #import "AFNetworking/AFNetworking.h"
 #import "EAILocation.h"
+#import "GDALUtility.h"
 
 typedef enum {
     EAIElevationServiceTypeSRTM,
@@ -104,6 +105,18 @@ typedef enum {
         
         [self.operations addObject:jrop];
         [self.queue addOperation:jrop];
+
+- (void)calculateElevationsForLocations:(NSArray*)locations {
+    NSInvocationOperation *invOp = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(localCalculateElevations:) object:locations];
+    [self.queue addOperation:invOp];
+}
+
+- (void)localCalculateElevations:(NSArray*)locations {
+    for (EAILocation *location in locations) {
+        location.elevation = [[GDALUtility sharedUtility] elevationForLatitude:location.latitude longitude:location.longitude];
+    }
+    if (self.completionBlock) {
+        self.completionBlock(locations, nil);
     }
 }
 
@@ -222,10 +235,10 @@ typedef enum {
     for (NSDictionary *resultJson in resultsJson) {
         EAILocation *location = itemsInRange[i];
         if (resultJson[@"srtm3"]) {
-            location.elevation = [resultJson[@"srtm3"] integerValue];
+            location.elevation = [resultJson[@"srtm3"] floatValue];
         }
         else {
-            location.elevation = [resultJson[@"astergdem"] integerValue];
+            location.elevation = [resultJson[@"astergdem"] floatValue];
         }
         i++;
     }

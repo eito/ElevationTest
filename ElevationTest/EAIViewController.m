@@ -417,9 +417,9 @@
             NSLog(@"error getting elevations: %@", error);
         }
     };
-    [_elevationTask findAstergdemElevationsForLocations:_activity.locations];
 //    [_elevationTask findGoogleElevationsForLocations:_activity.locations];
-//    [_elevationTask findAstergdemElevationsForLocations:_locations];
+//    [_elevationTask findAstergdemElevationsForLocations:_activity.locations];
+    [_elevationTask calculateElevationsForLocations:_activity.locations];
 }
 
 #pragma mark UITableView

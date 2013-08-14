@@ -20,14 +20,14 @@
     self = [super init];
     if (self) {
         _cllocation = [aDecoder decodeObjectForKey:@"cllocation"];
-        self.elevation = [aDecoder decodeIntegerForKey:@"elevation"];
+        self.elevation = [aDecoder decodeFloatForKey:@"elevation"];
     }
     return self;
 }
 
 -(void)encodeWithCoder:(NSCoder *)aCoder {
     [aCoder encodeObject:_cllocation forKey:@"cllocation"];
-    [aCoder encodeInteger:self.elevation forKey:@"elevation"];
+    [aCoder encodeFloat:self.elevation forKey:@"elevation"];
 }
 
 /*
@@ -45,7 +45,7 @@
                   course:(CLLocationDirection)course
                    speed:(CLLocationSpeed)speed
                timestamp:(NSDate *)timestamp
-               elevation:(double)elevation {
+               elevation:(CGFloat)elevation {
     CLLocation *loc = [[CLLocation alloc] initWithCoordinate:coordinate
                                                     altitude:altitude
                                           horizontalAccuracy:hAccuracy
@@ -71,7 +71,7 @@
 
 - (NSString*)description {
     NSString *clloc = [_cllocation description];
-    return [NSString stringWithFormat:@"calc elev: %dm, %@", self.elevation, clloc];
+    return [NSString stringWithFormat:@"NED elev: %fm, %@", self.elevation, clloc];
 }
 
 - (double)distanceFromLocation:(EAILocation*)location {
@@ -157,7 +157,7 @@
     double altitude = [json[@"altitude"] doubleValue];
     double secSinceEpoch = [json[@"timestamp"] doubleValue];
     NSDate *timestamp = [NSDate dateWithTimeIntervalSince1970:secSinceEpoch];
-    double elevation = [json[@"elevation"] integerValue];
+    double elevation = [json[@"elevation"] floatValue];
     
     return [self initWithCoordinate:CLLocationCoordinate2DMake(latitude, longitude)
                            altitude:altitude

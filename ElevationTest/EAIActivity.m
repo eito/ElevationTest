@@ -59,7 +59,7 @@
         self.currentAltitude = location.altitude;
         self.currentSpeed = location.speed;
         if (lastLoc) {
-            NSLog(@"dist: %f", [location distanceFromLocation:lastLoc]);
+            //NSLog(@"dist: %f", [location distanceFromLocation:lastLoc]);
             self.totalDistance += [location distanceFromLocation:lastLoc];
         }
         self.avgSpeed = ((self.avgSpeed * self.locations.count) + location.speed) / (self.locations.count + 1);
