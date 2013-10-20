@@ -9,7 +9,5 @@
 #import <UIKit/UIKit.h>
 
 @interface EAIActivityListViewController : UIViewController
--(id)initWithActivityPaths:(NSArray*)paths;
-
 @property (nonatomic, copy) void (^activitySelectBlock)(NSURL *fileURL);
 @end

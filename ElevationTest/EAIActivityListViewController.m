@@ -17,18 +17,7 @@
 -(id)init {
     self = [super init];
     if (self) {
-        self.activityFilesPaths = [@[] mutableCopy];
-        self.view.bounds = CGRectMake(0, 0, 200, 200);
-        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-        NSString *dirPath = paths[0];
-        NSArray *filepaths = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:dirPath error:nil];
-        for (NSString *path in filepaths) {
-            if ([path hasSuffix:@".json"]) {
-                NSURL *url = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/%@", dirPath, path]];
-                [self.activityFilesPaths addObject:url];
             }
-        }
-    }
     return self;
 }
 
@@ -41,6 +30,25 @@
     tv.delegate = self;
     tv.dataSource = self;
     [self.view addSubview:tv];
+    
+    self.edgesForExtendedLayout = UIRectEdgeNone;
+    // inset it on iOS7 from the status bar
+    [tv setContentInset:UIEdgeInsetsMake(20, tv.contentInset.left, tv.contentInset.bottom, tv.contentInset.right)];
+    
+    self.activityFilesPaths = [@[] mutableCopy];
+    self.view.bounds = CGRectMake(0, 0, 200, 200);
+    self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *dirPath = paths[0];
+    NSArray *filepaths = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:dirPath error:nil];
+    for (NSString *path in filepaths) {
+        if ([path hasSuffix:@".json"]) {
+            NSURL *url = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/%@", dirPath, path]];
+            [self.activityFilesPaths addObject:url];
+        }
+    }
+
+    [tv reloadData];
 }
 
 - (void)didReceiveMemoryWarning
