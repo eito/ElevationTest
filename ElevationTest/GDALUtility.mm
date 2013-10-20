@@ -18,7 +18,8 @@ static const NSString *kN35W118 = @"n35w118/grdn35w118_13/w001001.adf";
 
 
 @interface GDALUtility () {
-    GDALDataset *_poDataset;
+    NSMutableDictionary *_datasets;
+    NSString *_documentsDirectory;
 }
 
 @end
@@ -29,9 +30,10 @@ static const NSString *kN35W118 = @"n35w118/grdn35w118_13/w001001.adf";
 {
     self = [super init];
     if (self) {
+        _datasets = [NSMutableDictionary dictionary];
         GDALAllRegister();
-        NSString *filepath = [self filepathForLatitude:34.1 longitude:-117.1];
-        _poDataset =(GDALDataset*)GDALOpen([filepath UTF8String], GA_ReadOnly);
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        _documentsDirectory = [paths objectAtIndex:0];
     }
     return self;
 }
@@ -45,9 +47,9 @@ static const NSString *kN35W118 = @"n35w118/grdn35w118_13/w001001.adf";
 }
 
 - (void)dealloc {
-    if (_poDataset) {
-        GDALClose(_poDataset);
-    }
+    [_datasets enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        GDALClose((__bridge GDALDataset*)obj);
+    }];
 }
 
 - (void)calculateElevationsForLocations:(NSArray*)locations {
@@ -56,27 +58,18 @@ static const NSString *kN35W118 = @"n35w118/grdn35w118_13/w001001.adf";
     }
 }
 
-- (void)calculateElevationsForLatitudes:(NSArray *)latitudes longitudes:(NSArray*)longitudes {
-    if (latitudes.count != longitudes.count) {
-        return;
-    }
-    for (NSNumber *latitude in latitudes) {
-        
-    }
-}
-
 - (double)elevationForLatitude:(double)latitude longitude:(double)longitude {
     float elevation = -9999.0;
-    NSString *filepath = [self filepathForLatitude:latitude longitude:longitude];
-    //_poDataset = (GDALDataset*)GDALOpen([filepath UTF8String], GA_ReadOnly);
-    if (_poDataset) {
+
+    GDALDataset *gdalDataset = [self datasetForLatitude:latitude longitude:longitude];
+    if (gdalDataset) {
         double adfGeoTransform[6];
-        if (_poDataset->GetGeoTransform(adfGeoTransform) == CE_None) {
+        if (gdalDataset->GetGeoTransform(adfGeoTransform) == CE_None) {
             double x = longitude;
             double y = latitude;
             int rasterX = int((x - adfGeoTransform[0]) / adfGeoTransform[1]);
             int rasterY = int((y - adfGeoTransform[3]) / adfGeoTransform[5]);
-            GDALRasterBand *band = _poDataset->GetRasterBand(1);
+            GDALRasterBand *band = gdalDataset->GetRasterBand(1);
             int nBlockXSize,nBlockYSize;
             band->GetBlockSize(&nBlockXSize, &nBlockYSize);
             double adfMinMax[2];
@@ -90,40 +83,46 @@ static const NSString *kN35W118 = @"n35w118/grdn35w118_13/w001001.adf";
                 //NSLog(@"Success");
             }
         }
-//        GDALClose(_poDataset);
-//        _poDataset = NULL;
     }
     return elevation;
 }
 
-//- (NSString*)filenameFor
-
--(NSString *)documentsDirectoryPath {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectoryPath = [paths objectAtIndex:0];
-    return documentsDirectoryPath;
-}
-
-- (NSString*)filepathForLatitude:(double)latitude longitude:(double)longitude {
-    NSString *docsDir = [self documentsDirectoryPath];
+- (GDALDataset*)datasetForLatitude:(double)latitude longitude:(double)longitude {
+    GDALDataset *gdalDataset = nil;
+    NSString *key = nil;
+    NSString *path = nil;
+    
     if (longitude >= -118.0 && longitude < -117.0 &&
         latitude > 33.0 && latitude <= 34.0) {
-        return [NSString stringWithFormat:@"%@/%@", docsDir, kN34W118];
+        key = @"N34W118";
+        path = [NSString stringWithFormat:@"%@/%@", _documentsDirectory, kN34W118];
     }
     else if (longitude >= -118.0 && longitude < -117.0 &&
              latitude > 34.0 && latitude <= 35.0) {
-        return [NSString stringWithFormat:@"%@/%@", docsDir, kN35W118];
+        key = @"N35W118";
+        path = [NSString stringWithFormat:@"%@/%@", _documentsDirectory, kN35W118];
     }
     else if (longitude >= -117.0 && longitude < -116.0 &&
              latitude > 33.0 && latitude <= 34.0) {
-        return [NSString stringWithFormat:@"%@/%@", docsDir, kN34W117];
+        key = @"N34W117";
+        path = [NSString stringWithFormat:@"%@/%@", _documentsDirectory, kN34W117];
     }
     else if (longitude >= -117.0 && longitude < -116.0 &&
              latitude > 34.0 && latitude <= 35.0) {
-        return [NSString stringWithFormat:@"%@/%@", docsDir, kN35W117];
+        key = @"N35W117";
+        path = [NSString stringWithFormat:@"%@/%@", _documentsDirectory, kN35W117];
     }
     else {
         return nil;
     }
+    
+    gdalDataset = (GDALDataset*)[[_datasets valueForKey:key] pointerValue];
+    if (!gdalDataset) {
+        gdalDataset = (GDALDataset*)GDALOpen([path UTF8String], GA_ReadOnly);
+        if (gdalDataset) {
+            [_datasets setObject:[NSValue valueWithPointer:gdalDataset] forKey:key];
+        }
+    }
+    return gdalDataset;
 }
 @end
