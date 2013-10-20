@@ -10,6 +10,7 @@
 #import "EAIElevationTask.h"
 #import "EAILocation.h"
 #import "EAIElevationProfileView.h"
+#import "EAISpeedProfileView.h"
 #import "EAIActivity.h"
 #import "PopoverView.h"
 #import "EAIActivityListViewController.h"
@@ -19,6 +20,7 @@
     CLLocationManager *_locationManager;
     NSMutableArray *_locations;
     EAIElevationProfileView *_profileView;
+    EAISpeedProfileView *_speedView;
     BOOL _deferringUpdates;
     
     BOOL _bg;
@@ -87,6 +89,21 @@
     _profileView.minY = 0;
     _profileView.maxY = 160;
     [self.view addSubview:_profileView];
+    
+    [_speedView removeFromSuperview];
+    _speedView = [[EAISpeedProfileView alloc] initWithFrame:CGRectMake(5, 20, 310, 180) locations:locations];
+    _speedView.hidden = YES;
+    _speedView.layer.borderColor = [[UIColor blackColor] CGColor];
+    _speedView.layer.borderWidth = 2.0f;
+    _speedView.backgroundColor = [UIColor whiteColor];
+    _speedView.lineWidth = 3.0;
+    _speedView.lineColor = [UIColor blueColor];
+    _speedView.fillColor = [UIColor colorWithRed:0 green:120/255.0 blue:240/255.0 alpha:1.0];
+    _speedView.minX = 0;
+    _speedView.maxX = 320;
+    _speedView.minY = 0;
+    _speedView.maxY = 160;
+    [self.view addSubview:_speedView];
     
     //
     // add line
@@ -313,12 +330,22 @@
         // map visible
         _profileView.hidden = YES;
         // graph hidden
+        _speedView.hidden = YES;
+        // speed hidden
     }
-    else {
+    else if (seg.selectedSegmentIndex == 1) {
         self.mapView.hidden = YES;
         // map hidden
         _profileView.hidden = NO;
         // graph visible
+        _speedView.hidden = YES;
+    }
+    else {
+        self.mapView.hidden = YES;
+        // map hidden
+        _profileView.hidden = YES;
+        // graph visible
+        _speedView.hidden = NO;
     }
 }
 

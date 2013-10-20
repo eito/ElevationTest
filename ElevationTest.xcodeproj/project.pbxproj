@@ -40,6 +40,7 @@
 		4E4E629617ADBB0A000BD16C /* EAILocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E4E629517ADBB0A000BD16C /* EAILocation.m */; };
 		4E4E629E17AF1587000BD16C /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E4E629D17AF1587000BD16C /* MapKit.framework */; };
 		4E4E62A117AF1827000BD16C /* EAIElevationProfileView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E4E62A017AF1827000BD16C /* EAIElevationProfileView.m */; };
+		4E8A880B18147F7400303886 /* EAISpeedProfileView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E8A880A18147F7400303886 /* EAISpeedProfileView.m */; };
 		4E9ED05417B37A8500BEBF3D /* PopoverView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E9ED05217B37A8500BEBF3D /* PopoverView.m */; };
 		4E9ED05717B37DCC00BEBF3D /* EAIActivityListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E9ED05617B37DCC00BEBF3D /* EAIActivityListViewController.m */; };
 /* End PBXBuildFile section */
@@ -108,6 +109,8 @@
 		4E4E629D17AF1587000BD16C /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		4E4E629F17AF1827000BD16C /* EAIElevationProfileView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EAIElevationProfileView.h; sourceTree = "<group>"; };
 		4E4E62A017AF1827000BD16C /* EAIElevationProfileView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EAIElevationProfileView.m; sourceTree = "<group>"; };
+		4E8A880918147F7400303886 /* EAISpeedProfileView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EAISpeedProfileView.h; sourceTree = "<group>"; };
+		4E8A880A18147F7400303886 /* EAISpeedProfileView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EAISpeedProfileView.m; sourceTree = "<group>"; };
 		4E9ED05017B37A8500BEBF3D /* PopoverView_Configuration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PopoverView_Configuration.h; sourceTree = "<group>"; };
 		4E9ED05117B37A8500BEBF3D /* PopoverView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PopoverView.h; sourceTree = "<group>"; };
 		4E9ED05217B37A8500BEBF3D /* PopoverView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PopoverView.m; sourceTree = "<group>"; };
@@ -197,6 +200,8 @@
 				4E4E629517ADBB0A000BD16C /* EAILocation.m */,
 				4E4E629F17AF1827000BD16C /* EAIElevationProfileView.h */,
 				4E4E62A017AF1827000BD16C /* EAIElevationProfileView.m */,
+				4E8A880918147F7400303886 /* EAISpeedProfileView.h */,
+				4E8A880A18147F7400303886 /* EAISpeedProfileView.m */,
 				4E01BD2117BB62DE00206D8C /* GDALUtility.h */,
 				4E01BD2217BB62DE00206D8C /* GDALUtility.mm */,
 				4E2F4F4917B2282A00BAE0C1 /* EAIActivity.h */,
@@ -383,6 +388,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E8A880B18147F7400303886 /* EAISpeedProfileView.m in Sources */,
 				4E4E628917ADB32F000BD16C /* AFURLConnectionOperation.m in Sources */,
 				4E4E628B17ADB32F000BD16C /* UIImageView+AFNetworking.m in Sources */,
 				4E4E62A117AF1827000BD16C /* EAIElevationProfileView.m in Sources */,
