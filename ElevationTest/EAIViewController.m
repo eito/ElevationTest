@@ -28,6 +28,7 @@
     MKMapRect _currentActivityBBox;
     PopoverView *_popover;
     NSMutableArray *_activityFiles;
+    EAIActivityListViewController *_activityListVC;
 }
 
 @end
@@ -332,14 +333,17 @@
         }
     }
 
-//    _activityListVC = [[EAIActivityListViewController alloc] init];
-//    __weak EAIViewController *weakSelf = self;
-//    _activityListVC.activitySelectBlock = ^(NSURL *fileURL) {
-//        [weakSelf loadDataForActivityAtURL:fileURL];
-//        [weakSelf performSelectorOnMainThread:@selector(dismissPopover) withObject:nil waitUntilDone:NO];
-//    };
-    CGRect r = [(UIButton*)sender frame];
-    [PopoverView showPopoverAtPoint:CGPointMake(r.origin.x + r.size.width/2, r.origin.y) inView:self.view withStringArray:_activityFiles delegate:self];
+    _activityListVC = [[EAIActivityListViewController alloc] init];
+    __weak EAIViewController *weakSelf = self;
+    __weak EAIActivityListViewController *weakActivityVC = _activityListVC;
+    _activityListVC.activitySelectBlock = ^(NSURL *fileURL) {
+        [weakSelf loadDataForActivityAtURL:fileURL];
+        //[weakSelf performSelectorOnMainThread:@selector(dismissPopover) withObject:nil waitUntilDone:NO];
+        [weakActivityVC dismissViewControllerAnimated:YES completion:NULL];
+    };
+    [self presentViewController:_activityListVC animated:YES completion:NULL];
+//    CGRect r = [(UIButton*)sender frame];
+//    [PopoverView showPopoverAtPoint:CGPointMake(r.origin.x + r.size.width/2, r.origin.y) inView:self.view withStringArray:_activityFiles delegate:self];
 //    CGPoint center = CGPointMake(r.origin.x + r.size.width/2, r.origin.y);
 //    [PopoverView showPopoverAtPoint:center
 //                             inView:self.view
@@ -386,7 +390,7 @@
             [outStream open];
             [NSJSONSerialization writeJSONObject:json
                                         toStream:outStream
-                                         options:NSJSONWritingPrettyPrinted
+                                         options:0
                                            error:&error];
             [outStream close];
             if (error) {

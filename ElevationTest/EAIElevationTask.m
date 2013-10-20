@@ -113,6 +113,23 @@ typedef enum {
 - (void)calculateElevationsForLocations:(NSArray*)locations {
     NSInvocationOperation *invOp = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(localCalculateElevations:) object:locations];
     [self.queue addOperation:invOp];
+    
+    //
+    // can dispatch_async instead -- use diff queue though
+//    __weak EAIElevationTask *weakSelf = self;
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        double s = CACurrentMediaTime();
+//        [[GDALUtility sharedUtility] calculateElevationsForLocations:locations];
+//        //    for (EAILocation *location in locations) {
+//        //        location.elevation = [[GDALUtility sharedUtility] elevationForLatitude:location.latitude longitude:location.longitude];
+//        //    }
+//        if (weakSelf.completionBlock) {
+//            weakSelf.completionBlock(locations, nil);
+//        }
+//        
+//        double end = CACurrentMediaTime() - s;
+//        NSLog(@"+++++++++TIME: %f", end);
+//    });
 }
 
 - (void)localCalculateElevations:(NSArray*)locations {
@@ -124,6 +141,7 @@ typedef enum {
     if (self.completionBlock) {
         self.completionBlock(locations, nil);
     }
+    
     double end = CACurrentMediaTime() - s;
     NSLog(@"+++++++++TIME: %f", end);
 }
