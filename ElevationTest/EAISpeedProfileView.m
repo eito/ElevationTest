@@ -51,7 +51,7 @@ const double kMPS_to_MPH=2.23694;
         _speedLabel = [[UILabel alloc] initWithFrame:CGRectMake(w - 85, h - 20, 80, 20)];
         _speedLabel.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin;
         _speedLabel.textColor = self.speedTextColor;
-        _speedLabel.font = [UIFont systemFontOfSize:12];
+        _speedLabel.font = [UIFont boldSystemFontOfSize:12];
         _speedLabel.textAlignment = NSTextAlignmentRight;
         [self addSubview:_speedLabel];
     }
@@ -95,11 +95,19 @@ const double kMPS_to_MPH=2.23694;
     EAILocation *l = self.locations[idx];
     CGFloat y = [self yValueForLocation:l];
     int speed = l.speed;
-    _currentTouchPointSpeed = speed;//elevation * 3.28;
+    _currentTouchPointSpeed = speed * kMPS_to_MPH;//elevation * 3.28;
     
     //
     // update our speed text
-    _speedLabel.text = [NSString stringWithFormat:@"%.2f m/s", _currentTouchPointSpeed];
+    NSString *text = [NSString stringWithFormat:@"%.2f mph", _currentTouchPointSpeed];
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:text];
+    [attributedString addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat:-3.0] range:NSMakeRange(0,[text length])];
+    [attributedString addAttribute:NSStrokeColorAttributeName value:[UIColor blackColor] range:NSMakeRange(0, [text length])];
+    [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor whiteColor] range:NSMakeRange(0, [text length])];
+    
+    _speedLabel.attributedText=attributedString;
+    
+//    _speedLabel.text = [NSString stringWithFormat:@"%.2f mph", _currentTouchPointSpeed];
     //NSLog(@"speed: %d", speed);
     
     if ([sender state] == UIGestureRecognizerStateEnded) {
@@ -120,12 +128,14 @@ const double kMPS_to_MPH=2.23694;
     _locations = locations;
     self.minValue = NSIntegerMax;
     self.maxValue = NSIntegerMin;
+
     for (EAILocation *l in _locations) {
-        if (l.speed > self.maxValue) {
-            self.maxValue = l.speed;
+        double s = l.speed * kMPS_to_MPH;
+        if (s > self.maxValue) {
+            self.maxValue = s;
         }
-        if (l.speed < self.minValue) {
-            self.minValue = l.speed;
+        if (s < self.minValue) {
+            self.minValue = s;
         }
     }
 }
@@ -227,6 +237,6 @@ const double kMPS_to_MPH=2.23694;
 
 - (CGFloat)yValueForLocation:(EAILocation*)location {
     CGFloat h = CGRectGetHeight(self.bounds);
-    return h - (location.speed / (self.maxValue*(1+self.ceilingFactor) - self.minY)) * h;
+    return h - (location.speed * kMPS_to_MPH / (self.maxValue*(1+self.ceilingFactor) - self.minY)) * h;
 }
 @end

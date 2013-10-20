@@ -49,7 +49,7 @@
         _elevLabel = [[UILabel alloc] initWithFrame:CGRectMake(w - 85, h - 20, 80, 20)];
         _elevLabel.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin;
         _elevLabel.textColor = self.elevationTextColor;
-        _elevLabel.font = [UIFont systemFontOfSize:12];
+        _elevLabel.font = [UIFont boldSystemFontOfSize:12];
         _elevLabel.textAlignment = NSTextAlignmentRight;
         [self addSubview:_elevLabel];
     }
@@ -97,7 +97,15 @@
 
     //
     // update our elevation text
-    _elevLabel.text = [NSString stringWithFormat:@"%.2f ft", _currentTouchPointElevation];
+    //_elevLabel.text = [NSString stringWithFormat:@"%.2f ft", _currentTouchPointElevation];
+    NSString *text = [NSString stringWithFormat:@"%.2f ft", _currentTouchPointElevation];
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:text];
+    [attributedString addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat:-3.0] range:NSMakeRange(0,[text length])];
+    [attributedString addAttribute:NSStrokeColorAttributeName value:[UIColor blackColor] range:NSMakeRange(0, [text length])];
+    [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor whiteColor] range:NSMakeRange(0, [text length])];
+    
+    _elevLabel.attributedText=attributedString;
+
     //NSLog(@"elev: %d", elevation);
     
     if ([sender state] == UIGestureRecognizerStateEnded) {
