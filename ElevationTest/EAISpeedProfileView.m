@@ -95,7 +95,7 @@ const double kMPS_to_MPH=2.23694;
     EAILocation *l = self.locations[idx];
     CGFloat y = [self yValueForLocation:l];
     int speed = l.speed;
-    _currentTouchPointSpeed = speed * kMPS_to_MPH;//elevation * 3.28;
+    _currentTouchPointSpeed = speed * kMPS_to_MPH;
     
     //
     // update our speed text
@@ -103,8 +103,7 @@ const double kMPS_to_MPH=2.23694;
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:text];
     [attributedString addAttribute:NSStrokeWidthAttributeName value:[NSNumber numberWithFloat:-3.0] range:NSMakeRange(0,[text length])];
     [attributedString addAttribute:NSStrokeColorAttributeName value:[UIColor blackColor] range:NSMakeRange(0, [text length])];
-    [attributedString addAttribute:NSForegroundColorAttributeName value:[UIColor whiteColor] range:NSMakeRange(0, [text length])];
-    
+    [attributedString addAttribute:NSForegroundColorAttributeName value:self.speedTextColor range:NSMakeRange(0, [text length])];    
     _speedLabel.attributedText=attributedString;
     
 //    _speedLabel.text = [NSString stringWithFormat:@"%.2f mph", _currentTouchPointSpeed];
