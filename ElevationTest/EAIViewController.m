@@ -41,26 +41,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)goBG {
-    _bg = YES;
-    NSLog(@"%s", __PRETTY_FUNCTION__);
-    if ([CLLocationManager deferredLocationUpdatesAvailable] && !_deferringUpdates) {
-        [_locationManager allowDeferredLocationUpdatesUntilTraveled:1000 timeout:600];
-        _deferringUpdates = YES;
-    }
-}
-
-- (void)goFG {
-    _bg = NO;
-    NSLog(@"%s", __PRETTY_FUNCTION__);
-    if ([CLLocationManager deferredLocationUpdatesAvailable]) {
-        [_locationManager disallowDeferredLocationUpdates];
-        _deferringUpdates = NO;
-    }
-}
-
 - (void)loadDataForActivityAtURL:(NSURL*)fileURL {
-    [_locationManager stopUpdatingLocation];
     
     NSData *data = [NSData dataWithContentsOfURL:fileURL];
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:nil];
@@ -154,10 +135,6 @@
     
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-//      UIApplicationDidEnterBackgroundNotification
-//      UIApplicationWillEnterForegroundNotification
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(goBG) name:@"UIApplicationDidEnterBackgroundNotification" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(goFG) name:@"UIApplicationWillEnterForegroundNotification" object:nil];
     
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *dirPath = paths[0];
@@ -168,86 +145,17 @@
     if ([[NSFileManager defaultManager] fileExistsAtPath:filepath]) {
         NSURL *url = [NSURL fileURLWithPath:filepath];
         [self loadDataForActivityAtURL:url];
-//        NSData *data = [NSData dataWithContentsOfFile:filepath];
-//        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:nil];
-//        NSArray *jsonArray = json[@"locations"];
-//        NSMutableArray *locations = [@[] mutableCopy];
-//        _activity = [EAIActivity activity];
-//        for (NSDictionary *d in jsonArray) {
-//            [locations addObject:[[EAILocation alloc] initWithJSON:d]];
-//        }
-//        [_activity addLocations:locations];
-//        
-//        _profileView = [[EAIElevationProfileView alloc] initWithFrame:CGRectMake(5, 20, 310, 180) locations:locations];
-//        _profileView.hidden = YES;
-//        _profileView.layer.borderColor = [[UIColor blackColor] CGColor];
-//        _profileView.layer.borderWidth = 2.0f;
-//        _profileView.backgroundColor = [UIColor whiteColor];
-//        _profileView.lineWidth = 3.0;
-//        _profileView.lineColor = [UIColor blueColor];
-//        _profileView.fillColor = [UIColor colorWithRed:0 green:120/255.0 blue:240/255.0 alpha:1.0];
-//        _profileView.minX = 0;
-//        _profileView.maxX = 320;
-//        _profileView.minY = 0;
-//        _profileView.maxY = 160;
-//        [self.view addSubview:_profileView];
-//        
-//        //
-//        // add line
-//        CLLocationCoordinate2D *coordinateArray = malloc(sizeof(CLLocationCoordinate2D) * _activity.locations.count);
-//        
-//        int caIndex = 0;
-//        double xmin = 0;
-//        double xmax = 0;
-//        double ymin = 0;
-//        double ymax = 0;
-//        for (EAILocation *loc in _activity.locations) {
-//            coordinateArray[caIndex] = CLLocationCoordinate2DMake(loc.latitude, loc.longitude);
-//            MKMapPoint pt = MKMapPointForCoordinate(CLLocationCoordinate2DMake(loc.latitude, loc.longitude));
-//            if (caIndex == 0) {
-//                xmin = pt.x;
-//                xmax = pt.x;
-//                ymin = pt.y;
-//                ymax = pt.y;
-//            }
-//            else {
-//                if (pt.y < ymin) {
-//                    ymin = pt.y;
-//                }
-//                if (pt.y > ymax) {
-//                    ymax = pt.y;
-//                }
-//                if (pt.x < xmin) {
-//                    xmin = pt.x;
-//                }
-//                if (pt.x > xmax) {
-//                    xmax = pt.x;
-//                }
-//            }
-//            caIndex++;
-//        }
-//        _currentActivityBBox = MKMapRectMake(xmin, ymin, xmax - xmin, ymax - ymin);
-//        MKPolyline *lines = [MKPolyline polylineWithCoordinates:coordinateArray
-//                                                          count:_activity.locations.count];
-//
-//        free(coordinateArray);
-//        [self.mapView addOverlay:lines];
-//        [self.mapView setVisibleMapRect:_currentActivityBBox animated:YES];
-//        return;
     }
-
     
     _locationManager = [[CLLocationManager alloc] init];
     _locationManager.activityType = CLActivityTypeFitness;
     _locationManager.delegate = self;
-    _locationManager.pausesLocationUpdatesAutomatically = NO;
     _locationManager.desiredAccuracy =  kCLLocationAccuracyBest;
+    _locationManager.distanceFilter = kCLDistanceFilterNone;
     
     _elevationTask = [EAIElevationTask elevationTask];
     
-    //
-    // start now so we can get a fix
-    [_locationManager startUpdatingLocation];
+
 }
 
 - (void)didReceiveMemoryWarning
@@ -271,7 +179,7 @@
     if (!_deferringUpdates && [CLLocationManager deferredLocationUpdatesAvailable]) {
         NSLog(@"DEFERRED UPDATES AVAILABLE");
         _deferringUpdates = YES;
-        [_locationManager allowDeferredLocationUpdatesUntilTraveled:1000 timeout:600];
+        [_locationManager allowDeferredLocationUpdatesUntilTraveled:CLLocationDistanceMax timeout:CLTimeIntervalMax];
     }
     
     [self.tableView reloadData];
@@ -306,6 +214,10 @@
 #pragma Actions
 
 - (IBAction)startAction:(id)sender {
+    //
+    // start now so we can get a fix
+    [_locationManager startUpdatingLocation];
+    
     _record = YES;
     _activity = [EAIActivity activity];
     
@@ -319,8 +231,8 @@
 
 - (IBAction)stopAction:(id)sender {
 //    [_locationManager disallowDeferredLocationUpdates];
-    //[_locationManager stopUpdatingLocation];
     _record = NO;
+    [_locationManager stopUpdatingLocation];
 }
 
 - (IBAction)toggleMapAndGraph:(id)sender {
@@ -391,7 +303,6 @@
 }
 
 - (IBAction)exportLocations:(id)sender {
-    //[_locationManager stopUpdatingLocation];
     
     __weak EAIViewController *weakSelf = self;
     __weak EAIActivity *weakActivity = _activity;
