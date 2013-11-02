@@ -112,6 +112,14 @@
     free(coordinateArray);
 }
 
+-(void)goBG:(NSNotification*)note {
+    [self.mapView setShowsUserLocation:NO];
+}
+
+-(void)goFG:(NSNotification*)note {
+    [self.mapView setShowsUserLocation:_record];
+}
+
 - (void)viewDidLoad
 {
     
@@ -137,7 +145,9 @@
     
     _elevationTask = [EAIElevationTask elevationTask];
     
-
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(goBG:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(goFG:) name:UIApplicationWillEnterForegroundNotification object:nil];
 }
 
 - (void)didReceiveMemoryWarning
