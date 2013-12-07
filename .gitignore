@@ -1,3 +1,5 @@
 *.xcuserdatad
 .DS_Store
 project.xcworkspace
+xcshareddata/
+xcuserdata
