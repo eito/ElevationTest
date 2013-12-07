@@ -1,3 +1,3 @@
 [submodule "iOS-GPX-Framework"]
 	path = iOS-GPX-Framework
-	url = https://github.com/FLCLjp/iOS-GPX-Framework.git
+	url = git@github.com:eito/iOS-GPX-Framework.git
