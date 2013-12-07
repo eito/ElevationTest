@@ -14,6 +14,7 @@
 #import "EAIActivity.h"
 #import "PopoverView.h"
 #import "EAIActivityListViewController.h"
+#import "GPX.h"
 
 @interface EAIViewController ()<CLLocationManagerDelegate, UITableViewDataSource, UITableViewDelegate, MKMapViewDelegate, PopoverViewDelegate> {
     EAIElevationTask *_elevationTask;
@@ -32,6 +33,7 @@
     NSMutableArray *_activityFiles;
     EAIActivityListViewController *_activityListVC;
 }
+@property (weak, nonatomic) IBOutlet UIButton *saveButton;
 
 @end
 
@@ -314,12 +316,18 @@
 
 - (IBAction)exportLocations:(id)sender {
     
+    self.saveButton.enabled = NO;
+    
     __weak EAIViewController *weakSelf = self;
     __weak EAIActivity *weakActivity = _activity;
     _elevationTask.completionBlock = ^(NSArray *elevations, NSError *error) {
         [weakActivity recalculate];
         [weakSelf.tableView reloadData];
         NSLog(@"elevation count: %d", elevations.count);
+        
+        [weakSelf writeToGPXWithLocations:weakActivity.locations];
+        
+        weakSelf.saveButton.enabled = YES;
         if (!error) {
             //NSLog(@"elevations: %@", elevations);
             NSMutableDictionary *json = [@{} mutableCopy];
@@ -375,6 +383,7 @@
 //    [_elevationTask findGoogleElevationsForLocations:_activity.locations];
 //    [_elevationTask findAstergdemElevationsForLocations:_activity.locations];
     [_elevationTask calculateElevationsForLocations:_activity.locations];
+    
 }
 
 - (void)showAlertOnMainThread:(UIAlertView*)av {
@@ -459,4 +468,58 @@
     return _currentActivityView;
     
 }
+
+#pragma mark GPX
+
+-(void)writeToGPXWithLocations:(NSArray*)locations {
+    NSString *activityName = [NSString stringWithFormat:@"%lu", (unsigned long)([[NSDate date] timeIntervalSince1970] * 1000)];
+    
+    GPXRoot *root = [GPXRoot new];
+    root.creator = @"Eric Ito";
+    GPXMetadata *metadata = [GPXMetadata new];
+    metadata.name = activityName;
+
+    metadata.desc = nil;
+    
+    GPXAuthor *author = [GPXAuthor new];
+    author.name = @"Eric Ito";
+    metadata.author = author;
+    
+    metadata.copyright = nil;
+    metadata.time = [NSDate date];
+    
+    GPXBounds *bounds = [GPXBounds boundsWithMinLatitude:0 minLongitude:0 maxLatitude:0 maxLongitude:0];
+    metadata.bounds = bounds;
+    
+    root.metadata = metadata;
+    
+    GPXTrack *track = [GPXTrack new];
+    track.name = nil;
+    track.comment = nil;
+    track.desc = nil;
+    track.source = @"iPhone";
+    //    track.number = 0;
+    //    track.type = @"Track type";
+
+    GPXTrackSegment *segment = [GPXTrackSegment new];
+    for (EAILocation *location in locations) {
+        GPXTrackPoint *tp = [GPXTrackPoint trackpointWithLatitude:location.latitude longitude:location.longitude];
+        tp.time = location.timestamp;
+        tp.elevation = location.elevation;
+        [segment addTrackpoint:tp];
+    }
+    [track addTracksegment:segment];
+    
+    [root addTrack:track];
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *dirPath = paths[0];
+    NSString *filepath = [NSString stringWithFormat:@"%@/%@.gpx", dirPath, activityName];
+    
+    if(![[NSFileManager defaultManager] fileExistsAtPath:filepath isDirectory:NULL]) {
+        [root.gpx writeToFile:filepath atomically:YES encoding:NSUTF8StringEncoding error:nil];
+    }
+    
+}
+
 @end
